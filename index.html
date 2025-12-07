@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Sistema di gestione strategica per battaglie alleanza con mappa interattiva e assegnazione operatori" />
+  <meta name="theme-color" content="#2563eb" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Strategia Alleanza - Tempesta</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+```
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #e5e7eb;
+  min-height: 100vh;
+}
+
+.app-container {
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* HEADER */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: linear-gradient(90deg, #2563eb, #4f46e5);
+  color: white;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.header-title {
+  text-align: center;
+  font-weight: 800;
+  font-size: 24px;
+  margin-bottom: 16px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  background: white;
+  color: #4f46e5;
+}
+
+.btn-success {
+  background: #22c55e;
+  color: white;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.section {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* KILL SWAT */
+.kill-swat-section {
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+}
+
+.operators-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.operator-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.operator-input {
+  flex: 1;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.95);
+  color: #111827;
+}
+
+.operator-input:focus {
+  outline: none;
+  border-color: #fbbf24;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.3);
+}
+
+.btn-remove {
+  background: rgba(0, 0, 0, 0.3);
+  border: none;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  color: white;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-remove:hover {
+  background: rgba(0, 0, 0, 0.5);
+  transform: scale(1.1);
+}
+
+.btn-add {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 10px;
+  padding: 12px;
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-add:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* BUILDINGS GRID */
+.buildings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.building-card {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border-radius: 12px;
+  padding: 16px;
+  border: 2px solid rgba(59, 130, 246, 0.3);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.building-card:hover {
+  border-color: #3b82f6;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+}
+
+.building-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.building-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.protected-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #fbbf24;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.building-info {
+  flex: 1;
+}
+
+.building-number {
+  font-weight: 800;
+  font-size: 18px;
+  color: #3b82f6;
+}
+
+.building-type {
+  font-size: 14px;
+  color: #9ca3af;
+  margin: 2px 0;
+}
+
+.building-rate {
+  font-size: 14px;
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.player-tag {
+  background: rgba(34, 197, 94, 0.2);
+  border-left: 3px solid #22c55e;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.no-players {
+  color: #6b7280;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.modal {
+  background: #0f172a;
+  border-radius: 20px;
+  max-width: 500px;
+  width: 100%;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  padding: 20px;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #3b82f6;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 32px;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.modal-close:hover {
+  color: #ef4444;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-operators-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.modal-operator-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.modal-operator-input {
+  flex: 1;
+  border-radius: 10px;
+  border: 2px solid rgba(59, 130, 246, 0.3);
+  background: #1e293b;
+  color: white;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.modal-operator-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.modal-footer {
+  padding: 20px;
+  border-top: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.btn-full {
+  width: 100%;
+  border-radius: 12px;
+  padding: 14px;
+  border: none;
+  font-weight: 800;
+  font-size: 16px;
+  background: #22c55e;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-full:hover {
+  background: #16a34a;
+  transform: translateY(-2px);
+}
+
+/* SCREENSHOT VIEW */
+.hidden {
+  display: none !important;
+}
+
+.screenshot-view {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  padding: 0;
+}
+
+.screenshot-container {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.screenshot-header {
+  background: linear-gradient(90deg, #2563eb, #4f46e5);
+  color: white;
+  padding: 20px;
+  border-radius: 16px 16px 0 0;
+  text-align: center;
+}
+
+.screenshot-header-title {
+  font-weight: 800;
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.screenshot-date {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.screenshot-kill-section {
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+  color: white;
+  padding: 16px;
+  text-align: center;
+}
+
+.kill-swat-title {
+  font-weight: 800;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.kill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.kill-tag {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* MAP SECTION */
+.map-section {
+  background: rgba(15, 23, 42, 0.9);
+  padding: 0;
+  border-radius: 0;
+}
+
+.map-container {
+  position: relative;
+  background: linear-gradient(135deg, #d97706, #b45309);
+  border-radius: 0;
+  height: 650px;
+  overflow: hidden;
+  box-shadow: none;
+  margin-bottom: 0;
+}
+
+.map-building {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.map-building-tile {
+  width: 70px;
+  height: 70px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8);
+  position: relative;
+  font-size: 32px;
+}
+
+.map-protected-badge {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  background: #fbbf24;
+  border-radius: 50%;
+  border: 2px solid white;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.map-id-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: white;
+  color: #111827;
+  font-weight: 900;
+  font-size: 14px;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.map-operators {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 80px;
+}
+
+/* Colonna sinistra - nomi a DESTRA */
+.map-operators.left-column {
+  left: 100%;
+  top: 0;
+  margin-left: 10px;
+  align-items: flex-start;
+}
+
+/* Colonna destra - nomi a SINISTRA */
+.map-operators.right-column {
+  right: 100%;
+  top: 0;
+  margin-right: 10px;
+  align-items: flex-end;
+}
+
+/* Colonna centro - nomi SOTTO */
+.map-operators.center-column {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  align-items: center;
+}
+
+.map-operator-name {
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* STRATEGY TEXT */
+.strategy-section {
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 20px;
+  border: 2px solid rgba(34, 197, 94, 0.3);
+}
+
+.strategy-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.strategy-title {
+  font-weight: 800;
+  font-size: 18px;
+  color: #22c55e;
+}
+
+.btn-copy {
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-copy:hover {
+  background: #16a34a;
+  transform: translateY(-2px);
+}
+
+.strategy-text-wrapper {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  padding: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.strategy-text {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #4ade80;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.strategy-hint {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .header-title {
+    font-size: 20px;
+  }
+
+  .buildings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .map-container {
+    height: 450px;
+  }
+
+  .map-building-tile {
+    width: 55px;
+    height: 55px;
+    font-size: 26px;
+  }
+
+  .map-operator-name {
+    font-size: 9px;
+    padding: 2px 8px;
+  }
+
+  .map-operators {
+    min-width: 60px;
+  }
+}
+```
+
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-title">🎯 Gestione Strategia Alleanza</div>
+    <div class="header-buttons">
+      <button id="btnScreenshot" class="btn btn-primary">📸 Anteprima Screenshot</button>
+      <button id="btnCopyMain" class="btn btn-success">📋 Copia Testo Strategia</button>
+    </div>
+  </div>
+
+  <!-- EDIT VIEW -->
+
+  <div id="editView" class="main-content">
+    <!-- KILL SWAT SECTION -->
+    <div class="section kill-swat-section">
+      <div class="section-title">⚡ KILL SWAT - Unità Mobile d'Attacco</div>
+      <div id="killSwatList" class="operators-list"></div>
+      <button id="btnAddKillSwat" class="btn-add">
+        <span style="font-size: 20px;">+</span> Aggiungi Operatore
+      </button>
+    </div>
+
+```
+<!-- BUILDINGS SECTION -->
+<div class="section">
+  <div class="section-title">🏢 Assegnazione Edifici</div>
+  <div id="buildingsGrid" class="buildings-grid"></div>
+</div>
+```
+
+  </div>
+
+  <!-- MODAL -->
+
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div id="modalTitle" class="modal-title">Edificio</div>
+        <button id="modalClose" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="modalOperatorsList" class="modal-operators-list"></div>
+        <button id="btnAddModalOperator" class="btn-add">
+          <span style="font-size: 20px;">+</span> Aggiungi Operatore
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button id="modalSave" class="btn-full">✓ Salva Assegnazioni</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREENSHOT VIEW -->
+
+  <div id="screenshotView" class="screenshot-view hidden">
+    <div class="screenshot-container">
+      <!-- Sezione screenshot -->
+      <div id="screenshotCapture">
+        <!-- Kill Swat -->
+        <div id="screenshotKillSection" class="screenshot-kill-section" style="display: none;">
+          <div class="kill-swat-title">⚡ KILL SWAT - Unità Mobile d'Attacco</div>
+          <div id="killTags" class="kill-tags"></div>
+        </div>
+
+```
+    <!-- Map -->
+    <div class="map-section">
+      <div id="mapContainer" class="map-container"></div>
+    </div>
+  </div>
+
+  <!-- Strategy Text -->
+  <div class="strategy-section">
+    <div class="strategy-header">
+      <div class="strategy-title">📋 Testo Strategia Completa</div>
+      <button id="btnCopyScreenshot" class="btn-copy">📋 Copia Testo</button>
+    </div>
+    <div class="strategy-text-wrapper">
+      <pre id="strategyText" class="strategy-text"></pre>
+    </div>
+    <div class="strategy-hint">
+      💡 Copia il testo e condividilo nella chat dell'alleanza
+    </div>
+  </div>
+
+  <!-- Back Button -->
+  <div style="margin-top: 20px; text-align: center;">
+    <button id="btnBack" class="btn btn-primary" style="padding: 14px 32px; font-size: 16px;">
+      ← Torna alla Modifica
+    </button>
+  </div>
+</div>
+```
+
+  </div>
+</div>
+
+<script>
+  // ===== CONFIGURAZIONE EDIFICI (posizioni molto distanziate) =====
+  const buildings = [
+    // LATO DESTRO (colonna a 90%, molto distanziati verticalmente)
+    { id: 1, x: 90, y: 15, rate: 30, type: "Ospedale", icon: "🏥", color: "#ef4444" },
+    { id: 2, x: 90, y: 32, rate: 30, type: "Ospedale", icon: "🏥", color: "#ef4444" },
+    { id: 8, x: 90, y: 55, rate: 50, type: "Raffineria", icon: "⚙️", color: "#64748b" },
+    { id: 6, x: 90, y: 78, rate: 10, type: "C. Info", icon: "ℹ️", color: "#3b82f6" },
+
+    // LATO SINISTRO (colonna a 10%, molto distanziati verticalmente)
+    { id: 7, x: 10, y: 15, rate: 10, type: "C. Tech", icon: "📡", color: "#8b5cf6" },
+    { id: 5, x: 10, y: 32, rate: 50, type: "Raffineria", icon: "⚙️", color: "#64748b" },
+    { id: 4, x: 10, y: 55, rate: 30, type: "Ospedale", icon: "🏥", color: "#ef4444" },
+    { id: 3, x: 10, y: 78, rate: 30, type: "Ospedale", icon: "🏥", color: "#ef4444" },
+
+    // CENTRO (colonna a 50%, molto distanziati verticalmente)
+    { id: 10, x: 50, y: 22, rate: 10, protected: true, type: "Arsenale", icon: "🔫", color: "#475569" },
+    { id: 11, x: 50, y: 48, rate: 80, protected: true, type: "Silo", icon: "☢️", color: "#22c55e" },
+    { id: 9, x: 50, y: 74, rate: 10, protected: true, type: "Fabbrica", icon: "🏭", color: "#f59e0b" }
+  ];
+
+  // ===== STATO =====
+  let players = {};
+  let selectedBuildingId = null;
+
+  // ===== STORAGE =====
+  function loadPlayers() {
+    try {
+      const saved = localStorage.getItem("strategiaPlayers");
+      players = saved ? JSON.parse(saved) : {};
+    } catch {
+      players = {};
+    }
+
+    if (!players.killSwat || !Array.isArray(players.killSwat)) {
+      players.killSwat = [];
+    }
+
+    buildings.forEach(b => {
+      if (!players[b.id] || !Array.isArray(players[b.id])) {
+        players[b.id] = [];
+      }
+    });
+  }
+
+  function savePlayers() {
+    localStorage.setItem("strategiaPlayers", JSON.stringify(players));
+  }
+
+  // ===== GENERA TESTO STRATEGIA =====
+  function generateStrategyText() {
+    const killSwatNames = (players.killSwat || [])
+      .filter(p => p && p.trim() !== "")
+      .join(", ") || "**********";
+
+    const getNames = (ids) => {
+      const all = [];
+      ids.forEach(id => {
+        (players[id] || []).forEach(p => {
+          if (p && p.trim() !== "") all.push(p.trim());
+        });
+      });
+      return all.join(", ") || "**********";
+    };
+
+    const dateStr = new Date().toLocaleDateString("it-IT", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+
+    return `STRATEGIA OPERATIVA ALLEANZA - TEMPESTA
+
+Data: ${dateStr}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ KILL SWAT - CACCIA ALLE BALENE
+
+Questa unità rappresenta la nostra forza mobile di attacco rapido. Il loro compito è intercettare e neutralizzare gli edifici nemici prioritari, con particolare attenzione all'Arsenale (Edificio 10), alla Fabbrica di Mercenari (Edificio 9) e al Silo Nucleare (Edificio 11).
+
+Operatori assegnati: ${killSwatNames}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+☢️ SILO NUCLEARE - EDIFICIO 11
+
+Il Silo Nucleare è il cuore della nostra strategia difensiva. Con una generazione di +80 punti al secondo e protezione attiva, questo edificio deve essere dominato e difeso ad ogni costo. Il suo controllo impedisce qualsiasi contrattacco efficace da parte nemica.
+
+Operatori assegnati: ${getNames([11])}
+
+⚠️ ATTENZIONE: L'accesso al Silo è consentito solo dopo lo sblocco ufficiale e quando i bonus sono attivi. Prima di tale momento, gli operatori devono fornire supporto agli Edifici 1 e 4 (Ospedali).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔫 ARSENALE - EDIFICIO 10
+
+L'Arsenale fornisce un bonus cruciale del +15% ad attacco, difesa e punti vita di tutti gli alleati. Questo edificio, protetto e con generazione di +10 punti al secondo, si sblocca al minuto 10 della battaglia.
+
+Operatori assegnati: ${getNames([10])}
+
+Prima dello sblocco (primi 10 minuti): Gli operatori dell'Arsenale devono concentrarsi sul supporto all'Edificio 7 (Centro Tecnologico) per massimizzare i vantaggi tattici iniziali.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏭 FABBRICA DI MERCENARI - EDIFICIO 9
+
+La Fabbrica applica un debuff significativo del -15% a attacco, difesa e punti vita delle truppe nemiche. Questo edificio protetto con +10 punti al secondo diventa operativo al minuto 10.
+
+Operatori assegnati: ${getNames([9])}
+
+Prima dello sblocco (primi 10 minuti): Gli operatori della Fabbrica devono rinforzare gli Edifici 5 e 8 (Raffinerie) per garantire l'accumulo iniziale di punti.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚙️ RAFFINERIE - EDIFICI 5 E 8
+
+Le due Raffinerie sono fondamentali per l'economia di guerra nei primi 10 minuti. Ogni raffineria genera +50 punti al secondo, fornendo le risorse necessarie per stabilire la nostra presenza tattica sul campo.
+
+• Edificio 5 - Raffineria Ovest: +50 punti/secondo
+• Edificio 8 - Raffineria Est: +50 punti/secondo
+
+Operatori assegnati: ${getNames([5, 8])}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📡 CENTRI OPERATIVI - EDIFICI 6 E 7
+
+Il Centro Tecnologico (Edificio 7) e il Centro Informazioni (Edificio 6) forniscono vantaggi strategici critici: riduzione del tempo di teletrasporto, intelligence in tempo reale sul movimento nemico, e bonus globali alle operazioni.
+
+• Edificio 7 - Centro Tecnologico: +10 punti/secondo
+• Edificio 6 - Centro Informazioni: +10 punti/secondo
+
+Operatori assegnati: ${getNames([6, 7])}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏥 OSPEDALI SETTORE ALTO - EDIFICI 1 E 2
+
+Questi ospedali da campo nel settore nord-est sono responsabili della gestione dei feriti e del mantenimento operativo delle nostre truppe chiave. La loro posizione strategica li rende essenziali per sostenere le operazioni offensive.
+
+• Edificio 1 - Ospedale Nord-Est: +30 punti/secondo
+• Edificio 2 - Ospedale Est: +30 punti/secondo
+
+Operatori assegnati: ${getNames([1, 2])}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏥 OSPEDALI SETTORE BASSO - EDIFICI 3 E 4
+
+Gli ospedali nel settore sud-ovest garantiscono recupero rapido e formano una linea di difesa secondaria. La loro posizione permette di intercettare eventuali attacchi da sud.
+
+• Edificio 3 - Ospedale Sud-Ovest: +30 punti/secondo
+• Edificio 4 - Ospedale Ovest: +30 punti/secondo
+
+Operatori assegnati: ${getNames([3, 4])}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 NOTE OPERATIVE
+
+Il successo di questa strategia dipende dal coordinamento perfetto tra tutti gli operatori. È obbligatorio mantenere la comunicazione attiva via chat alleanza durante tutte le fasi della battaglia.
+
+Punti critici da rispettare:
+
+✓ Timing di sblocco al minuto 10 per Arsenale e Fabbrica
+✓ Kill Swat sempre in stato di allerta per interventi rapidi
+✓ Comunicazione immediata in caso di attacco agli edifici protetti
+✓ Priorità difensiva: Silo Nucleare > Arsenale > Fabbrica Mercenari
+
+La disciplina tattica e il supporto reciproco sono le chiavi della vittoria.
+
+💪 Forza Alleanza! 💪`;
+  }
+
+  // ===== RENDER KILL SWAT LIST =====
+  function renderKillSwatList() {
+    const container = document.getElementById("killSwatList");
+    
+    // Salva i valori correnti prima di ri-renderizzare
+    const currentInputs = container.querySelectorAll(".operator-input");
+    currentInputs.forEach((input, index) => {
+      if (players.killSwat[index] !== undefined) {
+        players.killSwat[index] = input.value || "";
+      }
+    });
+    
+    container.innerHTML = "";
+
+    if (players.killSwat.length === 0) {
+      players.killSwat.push("");
+    }
+
+    players.killSwat.forEach((name, index) => {
+      const item = document.createElement("div");
+      item.className = "operator-item";
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "operator-input";
+      input.placeholder = `Operatore ${index + 1}`;
+      input.value = name || "";
+      input.addEventListener("input", (e) => {
+        players.killSwat[index] = e.target.value;
+        savePlayers();
+      });
+
+      const btnRemove = document.createElement("button");
+      btnRemove.className = "btn-remove";
+      btnRemove.innerHTML = "×";
+      btnRemove.addEventListener("click", () => {
+        players.killSwat.splice(index, 1);
+        savePlayers();
+        renderKillSwatList();
+      });
+
+      item.appendChild(input);
+      if (players.killSwat.length > 1) {
+        item.appendChild(btnRemove);
+      }
+
+      container.appendChild(item);
+    });
+  }
+
+  // ===== RENDER EDIT VIEW =====
+  function renderEditView() {
+    renderKillSwatList();
+
+    const grid = document.getElementById("buildingsGrid");
+    grid.innerHTML = "";
+
+    buildings.forEach(b => {
+      const card = document.createElement("div");
+      card.className = "building-card";
+
+      const header = document.createElement("div");
+      header.className = "building-header";
+
+      const icon = document.createElement("div");
+      icon.className = "building-icon";
+      icon.style.backgroundColor = b.color;
+      icon.textContent = b.icon;
+
+      if (b.protected) {
+        const badge = document.createElement("div");
+        badge.className = "protected-badge";
+        badge.textContent = "🛡️";
+        icon.appendChild(badge);
+      }
+
+      const info = document.createElement("div");
+      info.className = "building-info";
+      info.innerHTML = `
+        <div class="building-number">Edificio ${b.id}</div>
+        <div class="building-type">${b.type}</div>
+        <div class="building-rate">+${b.rate}/s</div>
+      `;
+
+      header.appendChild(icon);
+      header.appendChild(info);
+
+      const playersList = document.createElement("div");
+      playersList.className = "players-list";
+
+      const assigned = (players[b.id] || []).filter(p => p && p.trim() !== "");
+      if (assigned.length > 0) {
+        assigned.forEach(p => {
+          const tag = document.createElement("div");
+          tag.className = "player-tag";
+          tag.textContent = "👤 " + p;
+          playersList.appendChild(tag);
+        });
+      } else {
+        const noPlayers = document.createElement("div");
+        noPlayers.className = "no-players";
+        noPlayers.textContent = "Nessun operatore assegnato";
+        playersList.appendChild(noPlayers);
+      }
+
+      card.appendChild(header);
+      card.appendChild(playersList);
+
+      card.addEventListener("click", () => openModal(b.id));
+
+      grid.appendChild(card);
+    });
+  }
+
+  // ===== MODAL =====
+  function openModal(id) {
+    selectedBuildingId = id;
+    const building = buildings.find(b => b.id === id);
+    document.getElementById("modalTitle").textContent = `Edificio ${id} - ${building.type}`;
+
+    renderModalOperatorsList();
+
+    document.getElementById("modalOverlay").style.display = "flex";
+  }
+
+  function renderModalOperatorsList() {
+    const container = document.getElementById("modalOperatorsList");
+    
+    // Salva i valori correnti prima di ri-renderizzare
+    const currentInputs = container.querySelectorAll(".modal-operator-input");
+    currentInputs.forEach((input, index) => {
+      if (players[selectedBuildingId] && players[selectedBuildingId][index] !== undefined) {
+        players[selectedBuildingId][index] = input.value || "";
+      }
+    });
+    
+    container.innerHTML = "";
+
+    if (!players[selectedBuildingId]) {
+      players[selectedBuildingId] = [];
+    }
+
+    if (players[selectedBuildingId].length === 0) {
+      players[selectedBuildingId].push("");
+    }
+
+    players[selectedBuildingId].forEach((name, index) => {
+      const item = document.createElement("div");
+      item.className = "modal-operator-item";
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "modal-operator-input";
+      input.placeholder = `Operatore ${index + 1}`;
+      input.value = name || "";
+      input.dataset.index = index;
+
+      const btnRemove = document.createElement("button");
+      btnRemove.className = "btn-remove";
+      btnRemove.innerHTML = "×";
+      btnRemove.addEventListener("click", () => {
+        players[selectedBuildingId].splice(index, 1);
+        renderModalOperatorsList();
+      });
+
+      item.appendChild(input);
+      if (players[selectedBuildingId].length > 1) {
+        item.appendChild(btnRemove);
+      }
+
+      container.appendChild(item);
+    });
+  }
+
+  function closeModal() {
+    document.getElementById("modalOverlay").style.display = "none";
+    selectedBuildingId = null;
+  }
+
+  function saveModal() {
+    if (!selectedBuildingId) return;
+
+    const inputs = document.querySelectorAll("#modalOperatorsList .modal-operator-input");
+    players[selectedBuildingId] = Array.from(inputs).map(input => input.value || "");
+
+    savePlayers();
+    renderEditView();
+    closeModal();
+  }
+
+  // ===== RENDER SCREENSHOT VIEW =====
+  function renderScreenshotView() {
+    // Kill Swat
+    const killSection = document.getElementById("screenshotKillSection");
+    const killTags = document.getElementById("killTags");
+    const ks = (players.killSwat || []).filter(p => p && p.trim() !== "");
+
+    killTags.innerHTML = "";
+    if (ks.length > 0) {
+      killSection.style.display = "block";
+      ks.forEach(p => {
+        const tag = document.createElement("div");
+        tag.className = "kill-tag";
+        tag.textContent = p;
+        killTags.appendChild(tag);
+      });
+    } else {
+      killSection.style.display = "none";
+    }
+
+    // Map
+    const mapContainer = document.getElementById("mapContainer");
+    mapContainer.innerHTML = "";
+
+    buildings.forEach(b => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "map-building";
+      wrapper.style.left = b.x + "%";
+      wrapper.style.top = b.y + "%";
+
+      const tile = document.createElement("div");
+      tile.className = "map-building-tile";
+      tile.style.backgroundColor = b.color;
+
+      if (b.protected) {
+        const protectedBadge = document.createElement("div");
+        protectedBadge.className = "map-protected-badge";
+        protectedBadge.textContent = "🛡️";
+        tile.appendChild(protectedBadge);
+      }
+
+      const idBadge = document.createElement("div");
+      idBadge.className = "map-id-badge";
+      idBadge.textContent = b.id;
+      tile.appendChild(idBadge);
+
+      const icon = document.createElement("div");
+      icon.textContent = b.icon;
+      tile.appendChild(icon);
+
+      wrapper.appendChild(tile);
+
+      // Operatori posizionati in base alla colonna
+      const assigned = (players[b.id] || []).filter(p => p && p.trim() !== "");
+      if (assigned.length > 0) {
+        const operatorsDiv = document.createElement("div");
+        operatorsDiv.className = "map-operators";
+
+        // Determina posizione in base a x
+        if (b.x < 30) {
+          // Colonna sinistra - nomi a destra
+          operatorsDiv.classList.add("left-column");
+        } else if (b.x > 70) {
+          // Colonna destra - nomi a sinistra
+          operatorsDiv.classList.add("right-column");
+        } else {
+          // Colonna centro - nomi sotto
+          operatorsDiv.classList.add("center-column");
+        }
+
+        assigned.forEach(p => {
+          const nameDiv = document.createElement("div");
+          nameDiv.className = "map-operator-name";
+          nameDiv.textContent = p;
+          operatorsDiv.appendChild(nameDiv);
+        });
+
+        wrapper.appendChild(operatorsDiv);
+      }
+
+      mapContainer.appendChild(wrapper);
+    });
+
+    // Strategy Text
+    document.getElementById("strategyText").textContent = generateStrategyText();
+  }
+
+  // ===== COPY TO CLIPBOARD =====
+  function copyStrategy(btnId) {
+    const text = generateStrategyText();
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        showCopyFeedback(btnId);
+      }).catch(() => {
+        fallbackCopy(text);
+        showCopyFeedback(btnId);
+      });
+    } else {
+      fallbackCopy(text);
+      showCopyFeedback(btnId);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand("copy");
+    } catch (e) {}
+    document.body.removeChild(textarea);
+  }
+
+  function showCopyFeedback(btnId) {
+    const btn = document.getElementById(btnId);
+    const originalText = btn.textContent;
+    btn.textContent = "✅ Copiato!";
+    btn.style.background = "#16a34a";
+
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.style.background = "";
+    }, 2000);
+  }
+
+  // ===== NAVIGATION =====
+  function showScreenshotView() {
+    renderScreenshotView();
+    document.getElementById("editView").classList.add("hidden");
+    document.querySelector(".header").classList.add("hidden");
+    document.getElementById("screenshotView").classList.remove("hidden");
+    
+    // Scroll automatico all'inizio della pagina
+    window.scrollTo(0, 0);
+  }
+
+  function showEditView() {
+    document.getElementById("screenshotView").classList.add("hidden");
+    document.querySelector(".header").classList.remove("hidden");
+    document.getElementById("editView").classList.remove("hidden");
+  }
+
+  // ===== INIT =====
+  document.addEventListener("DOMContentLoaded", () => {
+    loadPlayers();
+    renderEditView();
+
+    // Kill Swat add button
+    document.getElementById("btnAddKillSwat").addEventListener("click", () => {
+      players.killSwat.push("");
+      savePlayers();
+      renderKillSwatList();
+    });
+
+    // Modal add operator button
+    document.getElementById("btnAddModalOperator").addEventListener("click", () => {
+      if (selectedBuildingId) {
+        players[selectedBuildingId].push("");
+        renderModalOperatorsList();
+      }
+    });
+
+    // Buttons
+    document.getElementById("btnScreenshot").addEventListener("click", showScreenshotView);
+    document.getElementById("btnCopyMain").addEventListener("click", () => copyStrategy("btnCopyMain"));
+    document.getElementById("btnBack").addEventListener("click", showEditView);
+    document.getElementById("btnCopyScreenshot").addEventListener("click", () => copyStrategy("btnCopyScreenshot"));
+
+    // Modal
+    document.getElementById("modalClose").addEventListener("click", closeModal);
+    document.getElementById("modalSave").addEventListener("click", saveModal);
+    document.getElementById("modalOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "modalOverlay") closeModal();
+    });
+  });
+</script>
+
+</body>
+</html>
